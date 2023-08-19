@@ -1,0 +1,23 @@
+{
+	"image": "mcr.microsoft.com/devcontainers/universal:2",
+	"features": {
+		"ghcr.io/dapr/cli/dapr-cli:0": {},
+		"ghcr.io/devcontainers/features/azure-cli:1": {}
+	},
+	// Use 'forwardPorts' to make a list of ports inside the container available locally.
+	"forwardPorts": [7071],
+
+	// Use 'postCreateCommand' to run commands after the container is created.
+	"postCreateCommand": "bash ./.devcontainer/post-create.sh",
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"ms-azuretools.vscode-dapr",
+				"GitHub.copilot",
+				"github.copilot-chat",
+				"ms-python.python"
+			]
+		}
+	},
+	
+}
