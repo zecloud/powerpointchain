@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 pwd
-
+cd ..
 # loop through all the python directories and install the dependencies
 for d in */ ; do
     echo "Installing dependencies for $d"

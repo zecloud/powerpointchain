@@ -1,11 +1,14 @@
 RESOURCE_GROUP=""
 LOCATION="westeurope"
 CONTAINERAPPS_ENVIRONMENT=""
-OPENAI_API_KEY=""
 APP_NAME=""
 STORAGE_RG=""
 STORAGE_NAME=""
 REGISTRY_SERVER=""
+BING_SUBSCRIPTION_KEY=""
+BING_ENDPOINT=""
+RESOURCE_NAME=""
+DEPLOYMENT_NAME=""
 az containerapp up \
   --name $APP_NAME \
   --source . \
@@ -25,9 +28,15 @@ az containerapp secret set \
 az containerapp secret set \
   --name $APP_NAME \
   --resource-group $RESOURCE_GROUP \
-  --secrets openai-apikey=$OPENAI_API_KEY
+  --secrets openai-apikey=$OPENAIAPIKEY
+az containerapp secret set \
+  --name $APP_NAME \
+  --resource-group $RESOURCE_GROUP \
+  --secrets bing-skey=$BING_SUBSCRIPTION_KEY
 az containerapp update \
   --name $APP_NAME \
   --resource-group $RESOURCE_GROUP \
-  --set-env-vars "AZURE_STORAGE_ACCOUNT_NAME=$STORAGE_NAME" "AZURE_STORAGE_CONNECTION_STRING=secretref:qconnection-string" "OPENAIAPIKEY=secretref:openai-apikey"
+  --set-env-vars "AZURE_STORAGE_ACCOUNT_NAME=$STORAGE_NAME" "AZURE_STORAGE_CONNECTION_STRING=secretref:qconnection-string" \
+  "OPENAIAPIKEY=secretref:openai-apikey" "BING_SUBSCRIPTION_KEY=secretref:bing-skey" "BING_ENDPOINT=$BING_ENDPOINT" \
+  "RESOURCE_NAME=$RESOURCE_NAME" "DEPLOYMENT_NAME=$DEPLOYMENT_NAME"
   
