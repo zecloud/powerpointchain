@@ -28,7 +28,7 @@ tools = [Tool(
         description="useful for when you need to answer questions about current events and new technologies"
     )]
 agent = initialize_agent(
-    tools, llm, agent=AgentType.CHAT_CONVERSATIONAL_REACT_DESCRIPTION, verbose=True
+    tools, llm, agent=AgentType.CHAT_ZERO_SHOT_REACT_DESCRIPTION, verbose=True
 )
 
 if prompt := st.chat_input():
