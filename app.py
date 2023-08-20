@@ -22,11 +22,11 @@ llm =  AzureChatOpenAI(
         openai_api_type="azure",
         streaming=True
     )
-tools = load_tools([Tool(
+tools = [Tool(
         name = "Search",
         func=search.run,
         description="useful for when you need to answer questions about current events and new technologies"
-    )])
+    )]
 agent = initialize_agent(
     tools, llm, agent=AgentType.CHAT_CONVERSATIONAL_REACT_DESCRIPTION, verbose=True
 )
