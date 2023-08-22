@@ -1,3 +1,6 @@
 streamlit
 openai
 langchain
+msal-streamlit-authentication
+Office365-REST-Python-Client
+python-pptx
