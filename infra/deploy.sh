@@ -6,7 +6,7 @@ STORAGE_RG=""
 STORAGE_NAME=""
 REGISTRY_SERVER=""
 BING_SUBSCRIPTION_KEY=""
-BING_ENDPOINT=""
+BING_ENDPOINT="https://api.bing.microsoft.com/v7.0/search"
 RESOURCE_NAME=""
 DEPLOYMENT_NAME=""
 az containerapp up \
