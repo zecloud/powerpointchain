@@ -12,6 +12,8 @@ from pydantic.v1 import BaseModel, Field, validator
 from msal_streamlit_authentication import msal_authentication
 from pptx import Presentation
 from typing import List
+import requests
+from bs4 import BeautifulSoup
 import streamlit as st
 import os
 import json
@@ -51,9 +53,31 @@ llm =  AzureChatOpenAI(
         streaming=True
     )
 
+HEADERS = {
+    'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:90.0) Gecko/20100101 Firefox/90.0'
+}
+
+def parse_html(content) -> str:
+    soup = BeautifulSoup(content, 'html.parser')
+    text_content_with_links = soup.get_text()
+    return text_content_with_links
+
+def fetch_web_page(url: str) -> str:
+    response = requests.get(url, headers=HEADERS)
+    return parse_html(response.content)
+
+web_fetch_tool = Tool.from_function(
+    func=fetch_web_page,
+    name="WebFetcher",
+    description="Useful only if you need more detail to fetch the content of a web page"
+)
+
+
+
 class Slide(BaseModel):
     title: str = Field(description="Title of the slide")
     content: List[str] = Field(description="Content of the slide")
+    note: str = Field(description="Note of the slide")
     prompt: str = Field(description="Prompt of the slide")
 
 class Slides(BaseModel):
@@ -78,11 +102,15 @@ def save_slides(subject:str,slides: Slides):
 
         title_shape.text = slides[i]["title"]
         tf = body_shape.text_frame
+        notes_slide = slide.notes_slide
+        text_frame = notes_slide.notes_text_frame
+        text_frame.text = slides[i]["note"]
         for content in slides[i]["content"]:
             p = tf.add_paragraph()
             p.text = content
             p.level = 1
     prs.save('test.pptx')
+    return 'test.pptx'
     #with open("slides.json", "w") as f:
     #     f.write(json.dumps(slides))
 
@@ -94,17 +122,18 @@ prompt = PromptTemplate(
     input_variables=["query"],
     partial_variables={"format_instructions": parser.get_format_instructions()},
     template="""You are a software developer creating an automated PowerPoint generation program.
-         
          You decide the content that goes into each slide of the PowerPoint.
          Each slide typically consists of a topic, introduction, main points, conclusion, and references.
+         Each slide also contains detailed notes about the topic that add content to present the information.
          Follow the rules below:\n
-         Summarize and extract the key contents from the user's input around 5 slides.\n
-         Each slide contains 'title', 'content' and 'prompt'.\n
+         Use as much slides as you need.\n
+         Each slide contains 'title', 'content' 'note' and 'prompt'.\n
          'content' is a bullet point that breaks down the core content into brief, step-by-step chunks.\n
          All of the slides contain images.\n
-         If the slide contains a image, create a prompt to generate an image using the DALL-E API. And save it into 'prompt'.\n
+         If the slide contains a image, create a prompt to generate an image using the DALL-E. And save it into 'prompt'.\n
          {format_instructions}\n
          {query}\n"""
+        # Summarize and extract the key contents from the user's input around 5 slides.\n
          #Focus on nouns and adjectives and separate them with commas so that 'prompt' is a good visual representation of 'content'.\n
          #Set the above contents as keys named 'title', 'content', and 'prompt'.\n
          #Save the results of each slide as a JSON list.\n
@@ -127,8 +156,8 @@ llm_tool = Tool(
 tools=[Tool(
         name = "Search",
         func=search.run,
-        description="useful for when you need to answer questions about current events or the current state of the world"
-    ),llm_tool,tool_save_slide]
+        description="use it more for search and useful for when you need to answer questions about current events or the current state of the world"
+    ),llm_tool,tool_save_slide,web_fetch_tool]
 agent = initialize_agent(
     tools, llm, agent=AgentType.STRUCTURED_CHAT_ZERO_SHOT_REACT_DESCRIPTION, verbose=True
 )
