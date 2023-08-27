@@ -1,7 +1,10 @@
 streamlit
 openai
 langchain
-msal-streamlit-authentication
+#msal-streamlit-authentication
+git+https://github.com/streamlit/files-connection
+adlfs
 Office365-REST-Python-Client
 python-pptx
 beautifulsoup4
+pillow
