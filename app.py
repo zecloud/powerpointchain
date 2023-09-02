@@ -205,12 +205,15 @@ llm_tool = Tool(
 )
 
 
+searchurls=StructuredTool.from_function(search.results,name= "SearchMetadata",description="use it for search to get the urls to fetch pages")
+
 #tools = load_tools(["llm-math"], llm=llm)
 tools=[Tool(
         name = "Search",
         func=search.run,
-        description="use it more for search and useful for when you need to answer questions about current events or the current state of the world"
-    ),llm_tool,tool_save_slide,web_fetch_tool]
+        description="use it for search and useful for when you need to answer questions about current events or the current state of the world",
+        
+    ),searchurls,llm_tool,tool_save_slide,web_fetch_tool]
 agent = initialize_agent(
     tools, llm, agent=AgentType.STRUCTURED_CHAT_ZERO_SHOT_REACT_DESCRIPTION, verbose=True
 )
